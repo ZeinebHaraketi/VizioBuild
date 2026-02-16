@@ -115,9 +115,9 @@ const VisualizerId = () => {
   }, [project, isProjectLoading]);
 
   // Helper function to convert null to undefined
-  const getImageSrc = (image: string | null | undefined): string | undefined => {
-    return image ?? undefined;
-  };
+  // const getImageSrc = (image: string | null | undefined): string | undefined => {
+  //   return image ?? undefined;
+  // };
 
   return (
     <div className="visualizer">
