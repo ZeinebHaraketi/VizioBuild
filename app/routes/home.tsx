@@ -4,7 +4,8 @@ import { ArrowRight, ArrowUpRight, Clock, Layers } from "lucide-react";
 import Button from "components/ui/Button";
 import Upload from "components/Upload";
 import { useNavigate } from "react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createProject, getProjects } from "lib/puter.action";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -34,8 +35,10 @@ export default function Home() {
         timestamp: Date.now(),
       };
 
-      // const saved = await createProject({ item: newItem, visibility: 'private' });
-      const saved = newItem;
+      const saved = await createProject({
+        item: newItem,
+        visibility: "private",
+      });
       if (!saved) {
         console.error("Failed to create project");
         return false;
@@ -56,6 +59,16 @@ export default function Home() {
       isCreatingProjectRef.current = false;
     }
   };
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const items = await getProjects();
+
+      setProjects(items);
+    };
+
+    fetchProjects();
+  }, []);
 
   return (
     <div className="home">
@@ -99,7 +112,7 @@ export default function Home() {
               <p>Supports JPG, PNG, formats up to 10MB</p>
             </div>
 
-            <Upload />
+            <Upload onComplete={handleUploadComplete} />
           </div>
         </div>
       </section>
@@ -114,32 +127,37 @@ export default function Home() {
           </div>
 
           <div className="projects-grid">
-            <div className="project-card group">
-              <div className="preview">
-                <img
-                  src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFuZHNjYXBlJTIwZGVzaWdufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60"
-                  alt="Project"
-                />
+            {projects.map(
+              ({ id, name, renderedImage, sourceImage, timestamp }) => (
+                <div
+                  key={id}
+                  className="project-card group"
+                  onClick={() => navigate(`/visualizer/${id}`)}
+                >
+                  <div className="preview">
+                    <img src={renderedImage || sourceImage} alt="Project" />
 
-                <div className="badge">
-                  <span>Community</span>
+                    <div className="badge">
+                      <span>Community</span>
+                    </div>
+                  </div>
+
+                  <div className="card-body">
+                    <h3>{name}</h3>
+
+                    <div className="meta">
+                      <Clock size={12} />
+                      <span>{new Date(timestamp).toLocaleDateString()}</span>
+                      <span>By ZeinebHa</span>
+                    </div>
+
+                    <div className="arrow">
+                      <ArrowUpRight size={18} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="card-body">
-                <h3>Modern Villa</h3>
-
-                <div className="meta">
-                  <Clock size={12} />
-                  <span>{new Date(timestamp).toLocaleDateString()}</span>
-                  <span>By ZeinebHa</span>
-                </div>
-
-                <div className="arrow">
-                  <ArrowUpRight size={18} />
-                </div>
-              </div>
-            </div>
+              ),
+            )}
           </div>
         </div>
       </section>
