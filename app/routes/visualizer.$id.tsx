@@ -3,6 +3,10 @@ import { generate3DView } from "lib/ai.action";
 import { createProject, getProjectById } from "lib/puter.action";
 import { Box, Download, RefreshCcw, Share2, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import {
+  ReactCompareSlider,
+  ReactCompareSliderImage,
+} from "react-compare-slider";
 import { useNavigate, useOutletContext, useParams } from "react-router";
 
 const VisualizerId = () => {
@@ -110,6 +114,11 @@ const VisualizerId = () => {
     void runGeneration(project);
   }, [project, isProjectLoading]);
 
+  // Helper function to convert null to undefined
+  const getImageSrc = (image: string | null | undefined): string | undefined => {
+    return image ?? undefined;
+  };
+
   return (
     <div className="visualizer">
       <nav className="topbar">
@@ -155,7 +164,7 @@ const VisualizerId = () => {
               <div className="render-placeholder">
                 {project?.sourceImage && (
                   <img
-                    src={project?.sourceImage}
+                    src={project.sourceImage}
                     alt="Original"
                     className="render-fallback"
                   />
@@ -184,6 +193,39 @@ const VisualizerId = () => {
               <h3>Before and After</h3>
             </div>
             <div className="hint">Drag to compare</div>
+          </div>
+
+          <div className="compare-stage">
+            {project?.sourceImage && currentImage ? (
+              <ReactCompareSlider
+                defaultValue={50}
+                style={{ width: "100%", height: "auto" }}
+                itemOne={
+                  <ReactCompareSliderImage
+                    src={project.sourceImage}
+                    alt="before"
+                    className="compare-img"
+                  />
+                }
+                itemTwo={
+                  <ReactCompareSliderImage
+                    src={currentImage}
+                    alt="after"
+                    className="compare-img"
+                  />
+                }
+              />
+            ) : (
+              <div className="compare-fallback">
+                {project?.sourceImage && (
+                  <img
+                    src={project.sourceImage}
+                    alt="Before"
+                    className="compare-img"
+                  />
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
